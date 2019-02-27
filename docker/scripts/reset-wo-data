@@ -1,0 +1,7 @@
+#!/bin/sh
+
+BASEDIR=$(dirname "$0")
+source $BASEDIR/enable
+
+#docker-compose -p $RP_PRJ down --rmi all -v --remove-orphans
+docker-compose -p $RP_PRJ down -v --remove-orphans

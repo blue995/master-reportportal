@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export RP_PRJ=$(docker ps --filter="name=api" --format="{{.Names}}" | sed 's/\(.*\)_api_[0-9]*/\1/')
+export RP_NET=$(docker inspect ${RP_PRJ}_mongodb_1 | jq '.[0].NetworkSettings.Networks' | jq -r 'keys[]')
+export BASEDIR=$(dirname "$0")

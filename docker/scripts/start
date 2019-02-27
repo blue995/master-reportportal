@@ -1,0 +1,6 @@
+#!/bin/sh
+
+BASEDIR=$(dirname "$0")
+source $BASEDIR/enable
+
+docker-compose -p "$RP_PRJ" up -d --force-recreate

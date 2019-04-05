@@ -3,4 +3,4 @@
 BASEDIR=$(dirname "$0")
 source $BASEDIR/enable
 
-docker-compose -p $RP_PRJ logs
+docker-compose -p $RP_PRJ logs $*

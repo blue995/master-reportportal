@@ -48,11 +48,26 @@ services:
 #      - RP_MONGO_URI=mongodb://localhost:27017
     restart: always
 
+### Another option for gateway
+### Can be used instead of traefik
+#  gateway:
+#    image: fabiolb/fabio:1.5.8-go1.10
+#    ports:
+#      - "9998:9998" # GUI/management
+#      - "8080:9999" # HTTP exposed
+#    environment:
+#      - FABIO_REGISTRY_CONSUL_ADDR=registry:8500
+#      - FABIO_REGISTRY_CONSUL_REGISTER_NAME=gateway
+#      - FABIO_PROXY_ADDR=:9999;rt=300s;wt=300s
+#    restart: always
+
+
+
   gateway:
     image: traefik:1.6.6
     ports:
       - "8080:8080" # HTTP exposed
-      - "8081:8081" # HTTP Administration exposed
+#      - "8081:8081" # HTTP Administration exposed
     command:
       - --consulcatalog.endpoint=registry:8500
       - --defaultEntryPoints=http
@@ -64,7 +79,7 @@ services:
   index:
     image: reportportal/service-index:4.2.0
     environment:
-###      - RP_SERVER_PORT=8080
+      - RP_SERVER_PORT=8080
       - RP_PROXY_CONSUL=true
     depends_on:
        - registry
@@ -83,10 +98,10 @@ services:
 
   ui:
     image: reportportal/service-ui:4.3.6
-###    environment:
-###      - RP_SERVER.PORT=8080
-###      - RP_CONSUL.TAGS=urlprefix-/ui opts strip=/ui
-###      - RP_CONSUL.ADDRESS=registry:8500
+    environment:
+      - RP_SERVER.PORT=8080
+      - RP_CONSUL.TAGS=urlprefix-/ui opts strip=/ui
+      - RP_CONSUL.ADDRESS=registry:8500
     restart: always
 
   analyzer:

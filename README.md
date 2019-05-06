@@ -2,18 +2,19 @@
 
 ## Quickstart
 
-To initialize the project correctly just execute the `init.sh` script. It will execute the steps explained in the **Manual Installation** chapter.
+To initialize the project correctly just execute the `rp-init` script. It will execute the steps explained in the **Manual Installation** chapter.
 
 ## Manual Installation
 
-All these installation steps are executed by the `init.sh` script. Skip this chapter if you've executed the script before.
+All these installation steps are executed by the `rp-init` script. Skip this chapter if you've executed the script before.
 
 ### A) Setup folder for elastic search
 
 * `mkdir data`
 * `mkdir data/elasticsearch`
 * `chmod g+rwx data/elasticsearch`
-* `chgrp 1000 data/elasticsearch`
+* `sudo chown 1000:1000 data`
+* `sudo chown 1000:1000 data/elasticsearch`
 
 ### B) Setup production system for elastic search
 

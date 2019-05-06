@@ -1,0 +1,46 @@
+#!/bin/bash
+
+function create_dir {
+	local DIR="$1"
+	local USR="$2"
+	local USR_GRP="$3"
+	echo "Create directory '$DIR'"
+	if [[ -d "$DIR" ]]; then
+		echo "Directory already exists"
+	else
+		mkdir "$DIR"
+		echo "Created."
+
+		echo "Changing '$DIR' directory permissions: g+rwx"
+		chmod g+rwx "$DIR"
+
+		if [[ ! -z "$USR_GRP" && ! -z "$USR" ]]; then
+			echo "Changing user group of directory '$DIR': chown $USR:$USR_GRP"
+			sudo chown "$USR":"$USR_GRP" "$DIR"
+		fi
+	fi
+}
+
+function check_return {
+	local RET=$?
+	if [[ "$RET" -ne 0 ]]; then
+        	echo "Error: $RET"
+        	exit "$RET"
+	fi
+	return 0
+}
+
+if [[ -e "$RP_DIR" && ! -z "$RP_DIR" && -d "$RP_DIR" ]]; then
+	echo "Variable 'RP_DIR' is set to '$RP_DIR'"
+	echo "Changing working directory to '$RP_DIR'"
+	cd "$RP_DIR"
+else
+	echo "Variable RP_DIR not set."
+	echo "Aborting"
+	exit 1
+fi
+
+create_dir "data" 1000 1000
+check_return
+create_dir "data/elasticsearch" 1000 1000
+check_return

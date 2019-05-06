@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [[ -e "$RP_DIR" && ! -z "$RP_DIR" && -d "$RP_DIR" ]]; then
+	echo "Variable 'RP_DIR' is set to '$RP_DIR'"
+	echo "Changing working directory to '$RP_DIR'"
+	cd "$RP_DIR"
+else
+	echo "Variable RP_DIR not set."
+	echo "Aborting"
+	exit 1
+fi
+
+echo "Inspecting container logs..."
+bash docker/scripts/logs "$1"
+echo
+echo "You can filter the logs by providing the service name as first parameter."

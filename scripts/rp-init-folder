@@ -8,11 +8,11 @@ function create_dir {
 	if [[ -d "$DIR" ]]; then
 		echo "Directory already exists"
 	else
-		mkdir "$DIR"
+		sudo mkdir "$DIR"
 		echo "Created."
 
 		echo "Changing '$DIR' directory permissions: g+rwx"
-		chmod g+rwx "$DIR"
+		sudo chmod g+rwx "$DIR"
 
 		if [[ ! -z "$USR_GRP" && ! -z "$USR" ]]; then
 			echo "Changing user group of directory '$DIR': chown $USR:$USR_GRP"

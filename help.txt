@@ -1,0 +1,23 @@
+rp-start
+	Starts/recreates containers.
+
+rp-stop
+	Stops running containers
+
+rp-logs [service]
+	Shows logs of currently running containers.
+	You can filter the log messages by providing a service name as first parameter.
+
+rp-init
+	Initializes project folder and production environment.
+	More details see: /srv/shared/reportportal/README.md
+
+rp-init-folder
+	Initializes project folder.
+	More details see: /srv/shared/reportportal/README.md
+
+rp-init-prod-live
+	Initializes production environment for the current login session.
+
+rp-init-prod-persistent
+	Initializes production environment persistently.

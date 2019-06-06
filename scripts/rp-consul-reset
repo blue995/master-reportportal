@@ -1,0 +1,5 @@
+#!/bin/sh
+
+$RP_DIR/rp-stop
+sudo rm -rf $RP_DIR/data/consul
+$RP_DIR/rp-start

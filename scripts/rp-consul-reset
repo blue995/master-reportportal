@@ -1,5 +1,5 @@
 #!/bin/sh
 
-$RP_DIR/rp-stop
+$RP_DIR/scripts/rp-stop
 sudo rm -rf $RP_DIR/data/consul
-$RP_DIR/rp-start
+$RP_DIR/scripts/rp-start

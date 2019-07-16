@@ -11,6 +11,6 @@ else
 fi
 
 echo "Inspecting container logs..."
-bash docker/scripts/logs "$1"
+bash docker/scripts/logs "$*"
 echo
 echo "You can filter the logs by providing the service name as first parameter."

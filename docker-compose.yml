@@ -140,7 +140,7 @@ services:
       - "traefik.tags=reportportal"
 
   index:
-    image: reportportal/service-index:5.0.5
+    image: reportportal/service-index:5.0.6
     depends_on:
       gateway:
         condition: service_started
@@ -155,7 +155,7 @@ services:
       - "traefik.tags=reportportal"
 
   api:
-    image: bluefu/service-api-with-tfs:latest
+    image: bluefu/service-api-with-tfs:0.5
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -184,7 +184,7 @@ services:
       - "traefik.tags=reportportal"
 
   ui:
-    image: bluefu/service-ui-with-tfs:latest
+    image: bluefu/service-ui-with-tfs:0.5
     environment:
       - RP_SERVER_PORT=8080
     restart: always

@@ -65,7 +65,7 @@ services:
 
   ### initial db schema for reportportal
   db-scripts:
-    image: reportportal/migrations:5.0.0
+    image: reportportal/migrations:5.1.0-RC
     restart: on-failure
     depends_on:
       postgres:
@@ -119,7 +119,7 @@ services:
       retries: 5
 
   uat:
-    image: reportportal/service-authorization:5.0.0
+    image: reportportal/service-authorization:5.1.0-RC
     #ports:
     #  - "9999:9999"
     environment:
@@ -155,7 +155,7 @@ services:
       - "traefik.tags=reportportal"
 
   api:
-    image: bluefu/service-api-with-tfs:0.6
+    image: bluefu/service-api-with-tfs:5.1.0-BETA-1
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -174,7 +174,7 @@ services:
       - LOGGING_LEVEL_ORG_HIBERNATE_SQL=info
       - JAVA_OPTS=-Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp  -Dcom.sun.management.jmxremote.rmi.port=12349 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false  -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=10.6.128.241
       # Set this environment variable to the URL of the external TFS api
-      # - RP_BTS_TFS_SERVICE_URL=something
+      - RP_BTS_TFS_SERVICE_URL=something
     restart: always
     labels:
       - "traefik.backend=api"
@@ -184,7 +184,7 @@ services:
       - "traefik.tags=reportportal"
 
   ui:
-    image: bluefu/service-ui-with-tfs:0.6
+    image: bluefu/service-ui-with-tfs:5.1.0-BETA-1
     environment:
       - RP_SERVER_PORT=8080
     restart: always

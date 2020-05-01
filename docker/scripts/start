@@ -4,3 +4,4 @@ BASEDIR=$(dirname "$0")
 source $BASEDIR/enable
 
 docker-compose -p "$RP_PRJ" up -d --force-recreate
+docker-compose -p "$RP_PRJ" up -d --scale api=3

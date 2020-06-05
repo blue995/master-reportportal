@@ -37,7 +37,6 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.3.0
-    restart: always
     volumes:
       - ./data/elasticsearch:/usr/share/elasticsearch/data
     environment:
@@ -51,13 +50,14 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-      # ports:
-      # - "9200:9200"
+        #ports:
+            #  - "9200:9200"
     healthcheck:
       test: ["CMD", "curl","-s" ,"-f", "http://localhost:9200/_cat/health"]
+    restart: always
 
   analyzer:
-    image: reportportal/service-analyzer:5.0.0
+    image: reportportal/service-auto-analyzer:5.1.0
     depends_on:
       - rabbitmq
       - elasticsearch
@@ -65,8 +65,7 @@ services:
 
   ### initial db schema for reportportal
   db-scripts:
-    image: reportportal/migrations:5.1.0-RC
-    restart: on-failure
+    image: reportportal/migrations:5.1.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -76,7 +75,7 @@ services:
       POSTGRES_DB: reportportal
       POSTGRES_USER: rpuser
       POSTGRES_PASSWORD: rppass
-
+    restart: on-failure
 
   postgres:
     image: postgres:12-alpine
@@ -90,21 +89,23 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
       # For windows host
       # - postgres:/var/lib/postgresql/data
-    restart: on-failure
     # If you need to access the DB locally. Could be a security risk to expose DB.
-    #    ports:
-    #      - "5432:5432"
+    # ports:
+    # - "5432:5432"
     command:
       -c checkpoint_completion_target=0.9
       -c work_mem=96MB
       -c wal_writer_delay=20ms
       -c synchronous_commit=off
       -c wal_buffers=32MB
+      -c min_wal_size=2GB
+      -c max_wal_size=4GB
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
       interval: 10s
       timeout: 120s
       retries: 10
+    restart: always
 
   rabbitmq:
     image: rabbitmq:3.7.16-management
@@ -117,9 +118,10 @@ services:
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       retries: 5
+    restart: always
 
   uat:
-    image: reportportal/service-authorization:5.1.0-RC
+    image: reportportal/service-authorization:5.1.0
     #ports:
     #  - "9999:9999"
     environment:
@@ -131,20 +133,19 @@ services:
       - RP_BINARYSTORE_MINIO_ACCESSKEY=minio
       - RP_BINARYSTORE_MINIO_SECRETKEY=minio123
       - RP_SESSION_LIVE=86400 #in seconds
-    restart: always
     labels:
       - "traefik.backend=uat"
       - "traefik.frontend.rule=PathPrefixStrip:/uat"
       - "traefik.enable=true"
       - "traefik.port=9999"
       - "traefik.tags=reportportal"
+    restart: always
 
   index:
-    image: reportportal/service-index:5.0.6
+    image: reportportal/service-index:5.0.7
     depends_on:
       gateway:
         condition: service_started
-    restart: always
     environment:
       - LB_URL=http://gateway:8081
     labels:
@@ -153,7 +154,8 @@ services:
       - "traefik.enable=true"
       - "traefik.port=8080"
       - "traefik.tags=reportportal"
-
+    restart: always
+  
   api:
     image: bluefu/service-api-with-tfs:5.1.0-BETA-1
     depends_on:
@@ -175,13 +177,13 @@ services:
       - JAVA_OPTS=-Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp  -Dcom.sun.management.jmxremote.rmi.port=12349 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false  -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=10.6.128.241
       # Set this environment variable to the URL of the external TFS api
       - RP_BTS_TFS_SERVICE_URL=something
-    restart: always
     labels:
       - "traefik.backend=api"
       - "traefik.frontend.rule=PathPrefixStrip:/api"
       - "traefik.enable=true"
       - "traefik.port=8585"
       - "traefik.tags=reportportal"
+    restart: always
 
   ui:
     image: bluefu/service-ui-with-tfs:5.1.0-BETA-1
@@ -210,3 +212,4 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+    restart: always

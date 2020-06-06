@@ -190,8 +190,9 @@ services:
       - JAVA_OPTS=-Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp  -Dcom.sun.management.jmxremote.rmi.port=12349 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false  -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=0.0.0.0
       # Set this environment variable to the URL of the external TFS api
       - RP_BTS_TFS_SERVICE_URL=something
-      - RP_AMQP_QUEUES=15
-      - RP_AMQP_QUEUESPERPOD=5
+      ## Example for 3 API clients
+      #- RP_AMQP_QUEUES=15
+      #- RP_AMQP_QUEUESPERPOD=5
     labels:
       - "traefik.http.middlewares.api-strip-prefix.stripprefix.prefixes=/api"
       - "traefik.http.routers.api.middlewares=api-strip-prefix@docker"

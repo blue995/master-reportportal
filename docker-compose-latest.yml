@@ -53,16 +53,17 @@ services:
     restart: always
 
   analyzer:
-    image: reportportal/service-auto-analyzer:5.2.2
+    image: reportportal/service-auto-analyzer:5.3.0
     environment:
       LOGGING_LEVEL: info
+      AMQP_URL: amqp://rabbitmq:rabbitmq@rabbitmq:5672
     depends_on:
       - elasticsearch
     restart: always
 
-   ### Initial reportportal db schema. Run once.
+  ### Initial reportportal db schema. Run once.
   db-scripts:
-    image: reportportal/migrations:5.2.0
+    image: reportportal/migrations:5.3.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -129,7 +130,7 @@ services:
     restart: always
 
   uat:
-    image: reportportal/service-authorization:5.2.1
+    image: reportportal/service-authorization:5.3.0
     #ports:
     #  - "9999:9999"
     environment:
@@ -153,7 +154,7 @@ services:
     restart: always
 
   index:
-    image: reportportal/service-index:5.0.8
+    image: reportportal/service-index:5.0.10
     depends_on:
       gateway:
         condition: service_started
@@ -182,6 +183,10 @@ services:
       - RP_DB_USER=rpuser
       - RP_DB_PASS=rppass
       - RP_DB_NAME=reportportal
+      - RP_AMQP_USER=rabbitmq
+      - RP_AMQP_PASS=rabbitmq
+      - RP_AMQP_APIUSER=rabbitmq
+      - RP_AMQP_APIPASS=rabbitmq
       - RP_BINARYSTORE_TYPE=minio
       - RP_BINARYSTORE_MINIO_ENDPOINT=http://minio:9000
       - RP_BINARYSTORE_MINIO_ACCESSKEY=minio

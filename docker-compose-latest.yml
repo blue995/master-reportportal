@@ -1,5 +1,4 @@
- 
-## You can generate a custom docker compose file automatically on http://reportportal.io/download (Step 2)
+ ## You can generate a custom docker compose file automatically on http://reportportal.io/download (Step 2)
 
 ## This is example of Docker Compose for ReportPortal
 ## Do not forget to configure data volumes for production usage
@@ -39,6 +38,8 @@ services:
       - "bootstrap.memory_lock=true"
       - "discovery.type=single-node"
       - "logger.level=INFO"
+      - "xpack.security.enabled=true"
+      - "ELASTIC_PASSWORD=elastic1q2w3e"
     ulimits:
       memlock:
         soft: -1
@@ -49,21 +50,25 @@ services:
       # ports:
       # - "9200:9200"
     healthcheck:
-      test: ["CMD", "curl","-s" ,"-f", "http://localhost:9200/_cat/health"]
+      test: ["CMD", "curl","-s" ,"-f", "http://elastic:elastic1q2w3e@localhost:9200/_cat/health"]
     restart: always
 
   analyzer:
-    image: reportportal/service-auto-analyzer:5.3.0
+    image: reportportal/service-auto-analyzer:5.3.3
     environment:
       LOGGING_LEVEL: info
       AMQP_URL: amqp://rabbitmq:rabbitmq@rabbitmq:5672
+      ES_HOSTS: http://elastic:elastic1q2w3e@elasticsearch:9200
+      MINIO_SHORT_HOST: minio:9000
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
     depends_on:
       - elasticsearch
     restart: always
 
   ### Initial reportportal db schema. Run once.
   db-scripts:
-    image: reportportal/migrations:5.3.0
+    image: reportportal/migrations:5.3.3
     depends_on:
       postgres:
         condition: service_healthy
@@ -130,7 +135,7 @@ services:
     restart: always
 
   uat:
-    image: reportportal/service-authorization:5.3.0
+    image: reportportal/service-authorization:5.3.3
     #ports:
     #  - "9999:9999"
     environment:
@@ -168,7 +173,7 @@ services:
       - "traefik.http.services.index.loadbalancer.server.scheme=http"
       - "traefik.expose=true"
     restart: always
-
+  
   api:
     image: bluefu/service-api-with-tfs:latest
     depends_on:

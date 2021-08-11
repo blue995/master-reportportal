@@ -13,6 +13,7 @@
 
 version: "2.4"
 services:
+
   gateway:
     image: traefik:v2.0.7
     ports:
@@ -49,18 +50,11 @@ services:
       # ports:
       # - "9200:9200"
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-s",
-          "-f",
-          "http://elastic:elastic1q2w3e@localhost:9200/_cat/health",
-        ]
+      test: ["CMD", "curl", "-s", "-f", "http://elastic:elastic1q2w3e@localhost:9200/_cat/health"]
     restart: always
 
   analyzer: #an analyzer instance for main functionality, don't forget to use the same storage settings(either minio, or filesystem) for analyzer_train
-    image: reportportal/service-auto-analyzer:5.4.0
+    image: reportportal/service-auto-analyzer:5.5.0
     environment:
       LOGGING_LEVEL: info
       AMQP_URL: amqp://rabbitmq:rabbitmq@rabbitmq:5672
@@ -73,7 +67,7 @@ services:
     restart: always
 
   analyzer_train: #an analyzer instance for training, don't forget to setup the same storage(either minio, or filesystem) as for main analyzer
-    image: reportportal/service-auto-analyzer:5.4.0
+    image: reportportal/service-auto-analyzer:5.5.0
     environment:
       LOGGING_LEVEL: info
       AMQP_URL: amqp://rabbitmq:rabbitmq@rabbitmq:5672
@@ -87,9 +81,29 @@ services:
       - elasticsearch
     restart: always
 
+  metrics-gatherer: # metrics service for analyzing how analyzer is working and manage retrained models
+    image: reportportal/service-metrics-gatherer:1.1.14
+    environment:
+      LOGGING_LEVEL: info
+      ES_HOST: http://elasticsearch:9200
+      ES_USER: elastic
+      ES_PASSWORD: elastic1q2w3e
+      POSTGRES_USER: "rpuser"
+      POSTGRES_PASSWORD: "rppass"
+      POSTGRES_DB: "reportportal"
+      POSTGRES_HOST: "postgres"
+      POSTGRES_PORT: 5432
+      ALLOWED_START_TIME: "22:00"
+      ALLOWED_END_TIME: "08:00"
+      #TZ: Europe/Minsk you can change a timezone like this to specify when metrics are gathered
+      AMQP_URL: amqp://rabbitmq:rabbitmq@rabbitmq:5672
+    depends_on:
+      - elasticsearch
+    restart: always
+
   ### Initial reportportal db schema. Run once.
   db-scripts:
-    image: reportportal/migrations:5.4.0
+    image: reportportal/migrations:5.5.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -116,7 +130,8 @@ services:
     # If you need to access the DB locally. Could be a security risk to expose DB.
     #    ports:
     #      - "5432:5432"
-    command: -c checkpoint_completion_target=0.9
+    command: 
+      -c checkpoint_completion_target=0.9
       -c work_mem=96MB
       -c wal_writer_delay=20ms
       -c synchronous_commit=off
@@ -155,7 +170,7 @@ services:
     restart: always
 
   uat:
-    image: reportportal/service-authorization:5.4.0
+    image: reportportal/service-authorization:5.5.0
     #ports:
     #  - "9999:9999"
     environment:
@@ -195,7 +210,7 @@ services:
     restart: always
 
   api:
-    image: bluefu/service-api-with-tfs:5.4.0-RC-1
+    image: bluefu/service-api-with-tfs:5.5.0
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -219,7 +234,7 @@ services:
       - LOGGING_LEVEL_ORG_HIBERNATE_SQL=info
       - JAVA_OPTS=-Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp  -Dcom.sun.management.jmxremote.rmi.port=12349 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false  -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=0.0.0.0
       # Set this environment variable to the URL of the external TFS api
-      - RP_BTS_TFS_SERVICE_URL=something
+      - RP_BTS_TFS_SERVICE_URL=http://host.docker.internal:8090
       ## Example for 3 API clients
       #- RP_AMQP_QUEUES=15
       #- RP_AMQP_QUEUESPERPOD=5
@@ -234,7 +249,7 @@ services:
     restart: always
 
   jobs:
-    image: reportportal/service-jobs:5.4.0
+    image: reportportal/service-jobs:5.5.0
     environment:
       RP_DB_HOST: postgres
       RP_DB_USER: rpuser
@@ -259,7 +274,7 @@ services:
       - traefik.expose=true
 
   ui:
-    image: bluefu/service-ui-with-tfs:5.4.0-RC-1
+    image: bluefu/service-ui-with-tfs:5.5.0
     environment:
       - RP_SERVER_PORT=8080
     labels:

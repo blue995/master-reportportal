@@ -98,6 +98,8 @@ services:
   metrics-gatherer: 
     image: reportportal/service-metrics-gatherer:1.1.20
     environment:
+      PROB_CUSTOM_MODEL_AUTO_ANALYSIS: 0.0
+      PROB_CUSTOM_MODEL_SUGGESTIONS: 0.0
       LOGGING_LEVEL: info
       ES_HOST: http://elasticsearch:9200
       ES_USER: elastic
@@ -309,7 +311,7 @@ services:
     restart: always
 
   ui:
-    image: bluefu/service-ui-with-tfs:5.7.2
+    image: bluefu/service-ui-with-tfs:5.7.2.1
     environment:
       - RP_SERVER_PORT=8080
     labels:
